@@ -1,0 +1,439 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core helper primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isBootstrapAdmin() {
+      return isSignedIn()
+        && request.auth.token.email == 'meutuah456@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin()
+        || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'displayName', 'favorites', 'prepChecklist', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'favorites', 'prepChecklist', 'createdAt', 'updatedAt'])
+        && data.uid is string
+        && data.uid == userId
+        && data.uid == request.auth.uid
+        && data.displayName is string
+        && data.displayName.size() >= 1
+        && data.displayName.size() <= 100
+        && data.favorites is list
+        && data.favorites.size() <= 100
+        && (data.favorites.size() == 0 || (data.favorites[0] is string && data.favorites[0].size() <= 64))
+        && data.prepChecklist is map
+        && data.prepChecklist.size() <= 20
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserTrip(data, userId) {
+      return data.keys().hasAll(['userId', 'name', 'date', 'days', 'travellers', 'activities', 'totalEstimate', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'name', 'date', 'days', 'travellers', 'activities', 'totalEstimate', 'createdAt', 'updatedAt'])
+        && data.userId is string
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.name is string
+        && data.name.size() >= 1
+        && data.name.size() <= 80
+        && data.date is string
+        && data.date.size() <= 20
+        && data.days is int
+        && data.days >= 1
+        && data.days <= 5
+        && data.travellers is int
+        && data.travellers >= 1
+        && data.travellers <= 50
+        && data.activities is list
+        && data.activities.size() <= 50
+        && (data.activities.size() == 0 || data.activities[0] is map)
+        && data.totalEstimate is number
+        && data.totalEstimate >= 0
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTravelBooking(data, userId) {
+      return data.keys().hasAll([
+          'userId', 'bookingCode', 'vehicleId', 'vehicleName',
+          'pickupLocation', 'destinationRegion', 'pickupDate', 'days',
+          'passengers', 'serviceType', 'contactName', 'contactPhone',
+          'notes', 'totalEstimate', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'userId', 'bookingCode', 'vehicleId', 'vehicleName',
+          'pickupLocation', 'destinationRegion', 'pickupDate', 'days',
+          'passengers', 'serviceType', 'contactName', 'contactPhone',
+          'notes', 'totalEstimate', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.userId is string
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.bookingCode is string
+        && data.bookingCode.size() >= 4
+        && data.bookingCode.size() <= 32
+        && data.bookingCode.matches('^[A-Z0-9\\-]+$')
+        && data.vehicleId is string
+        && data.vehicleId.size() >= 1
+        && data.vehicleId.size() <= 64
+        && data.vehicleName is string
+        && data.vehicleName.size() >= 1
+        && data.vehicleName.size() <= 80
+        && data.pickupLocation is string
+        && data.pickupLocation.size() >= 1
+        && data.pickupLocation.size() <= 100
+        && data.destinationRegion is string
+        && data.destinationRegion.size() >= 1
+        && data.destinationRegion.size() <= 80
+        && data.pickupDate is string
+        && data.pickupDate.size() >= 1
+        && data.pickupDate.size() <= 20
+        && data.days is int
+        && data.days >= 1
+        && data.days <= 7
+        && data.passengers is int
+        && data.passengers >= 1
+        && data.passengers <= 12
+        && data.serviceType in ['driver_fuel', 'driver_only']
+        && data.contactName is string
+        && data.contactName.size() >= 1
+        && data.contactName.size() <= 80
+        && data.contactPhone is string
+        && data.contactPhone.size() >= 6
+        && data.contactPhone.size() <= 24
+        && data.notes is string
+        && data.notes.size() <= 240
+        && data.totalEstimate is number
+        && data.totalEstimate >= 0
+        && data.status in ['pending', 'cancelled']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidStayBooking(data, userId) {
+      return data.keys().hasAll([
+          'userId', 'bookingCode', 'stayId', 'stayName',
+          'stayRegion', 'roomType', 'checkInDate', 'nights',
+          'rooms', 'guests', 'contactName', 'contactPhone',
+          'notes', 'totalEstimate', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'userId', 'bookingCode', 'stayId', 'stayName',
+          'stayRegion', 'roomType', 'checkInDate', 'nights',
+          'rooms', 'guests', 'contactName', 'contactPhone',
+          'notes', 'totalEstimate', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.userId is string
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.bookingCode is string
+        && data.bookingCode.size() >= 4
+        && data.bookingCode.size() <= 32
+        && data.bookingCode.matches('^[A-Z0-9\\-]+$')
+        && data.stayId is string
+        && data.stayId.size() >= 1
+        && data.stayId.size() <= 64
+        && data.stayName is string
+        && data.stayName.size() >= 1
+        && data.stayName.size() <= 100
+        && data.stayRegion is string
+        && data.stayRegion.size() >= 1
+        && data.stayRegion.size() <= 80
+        && data.roomType is string
+        && data.roomType.size() >= 1
+        && data.roomType.size() <= 60
+        && data.checkInDate is string
+        && data.checkInDate.size() >= 1
+        && data.checkInDate.size() <= 20
+        && data.nights is int
+        && data.nights >= 1
+        && data.nights <= 14
+        && data.rooms is int
+        && data.rooms >= 1
+        && data.rooms <= 5
+        && data.guests is int
+        && data.guests >= 1
+        && data.guests <= 12
+        && data.contactName is string
+        && data.contactName.size() >= 1
+        && data.contactName.size() <= 80
+        && data.contactPhone is string
+        && data.contactPhone.size() >= 6
+        && data.contactPhone.size() <= 24
+        && data.notes is string
+        && data.notes.size() <= 240
+        && data.totalEstimate is number
+        && data.totalEstimate >= 0
+        && data.status in ['pending', 'cancelled']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidServiceBooking(data, userId) {
+      return data.keys().hasAll([
+          'userId', 'bookingCode', 'serviceType', 'itemId',
+          'itemName', 'itemRegion', 'serviceDate', 'quantity',
+          'unitPrice', 'totalEstimate', 'contactName', 'contactPhone',
+          'notes', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'userId', 'bookingCode', 'serviceType', 'itemId',
+          'itemName', 'itemRegion', 'serviceDate', 'quantity',
+          'unitPrice', 'totalEstimate', 'contactName', 'contactPhone',
+          'notes', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.userId is string
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.bookingCode is string
+        && data.bookingCode.size() >= 4
+        && data.bookingCode.size() <= 32
+        && data.bookingCode.matches('^[A-Z0-9\\-]+$')
+        && data.serviceType in ['destination', 'food', 'waterboom']
+        && data.itemId is string
+        && data.itemId.size() >= 1
+        && data.itemId.size() <= 64
+        && data.itemName is string
+        && data.itemName.size() >= 1
+        && data.itemName.size() <= 120
+        && data.itemRegion is string
+        && data.itemRegion.size() >= 1
+        && data.itemRegion.size() <= 80
+        && data.serviceDate is string
+        && data.serviceDate.size() >= 1
+        && data.serviceDate.size() <= 20
+        && data.quantity is int
+        && data.quantity >= 1
+        && data.quantity <= 50
+        && data.unitPrice is number
+        && data.unitPrice >= 0
+        && data.totalEstimate is number
+        && data.totalEstimate >= 0
+        && data.contactName is string
+        && data.contactName.size() >= 1
+        && data.contactName.size() <= 80
+        && data.contactPhone is string
+        && data.contactPhone.size() >= 6
+        && data.contactPhone.size() <= 24
+        && data.notes is string
+        && data.notes.size() <= 240
+        && data.status in ['pending', 'cancelled']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCatalogEntry(data) {
+      return data.keys().hasAll(['collectionType', 'payload', 'updatedBy', 'updatedAt'])
+        && data.keys().hasOnly(['collectionType', 'payload', 'updatedBy', 'updatedAt'])
+        && data.collectionType in ['destinations', 'foods', 'stays', 'packages']
+        && data.payload is map
+        && data.payload.size() >= 1
+        && data.payload.size() <= 20
+        && data.updatedBy is string
+        && data.updatedBy == request.auth.uid
+        && data.updatedAt is timestamp;
+    }
+
+    // Owner-scoped User Profiles
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow create: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'favorites', 'prepChecklist', 'updatedAt']);
+      allow delete: if isValidId(userId) && isOwner(userId);
+
+      // Master Gate: Trips subcollection checks parent user doc
+      match /trips/{tripId} {
+        allow get: if isValidId(userId) && isValidId(tripId) && isOwner(userId);
+        allow list: if isValidId(userId)
+          && isOwner(userId)
+          && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(tripId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidUserTrip(incoming(), userId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId)
+          && isValidId(tripId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidUserTrip(incoming(), userId)
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'date', 'days', 'travellers', 'activities', 'totalEstimate', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(tripId) && isOwner(userId);
+      }
+
+      // Master Gate: Travel car bookings subcollection
+      match /bookings/{bookingId} {
+        allow get: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+        allow list: if isValidId(userId)
+          && isOwner(userId)
+          && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidTravelBooking(incoming(), userId)
+          && incoming().status == 'pending'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidTravelBooking(incoming(), userId)
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            isAdmin() ||
+            (
+              existing().status != 'cancelled'
+              && incoming().status == 'cancelled'
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+            )
+          );
+        allow delete: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+      }
+
+      // Master Gate: Accommodation stay bookings subcollection
+      match /stayBookings/{bookingId} {
+        allow get: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+        allow list: if isValidId(userId)
+          && isOwner(userId)
+          && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidStayBooking(incoming(), userId)
+          && incoming().status == 'pending'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidStayBooking(incoming(), userId)
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            isAdmin() ||
+            (
+              existing().status != 'cancelled'
+              && incoming().status == 'cancelled'
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+            )
+          );
+        allow delete: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+      }
+
+      // Master Gate: Per-page service bookings subcollection (destinations, culinary, waterboom)
+      match /serviceBookings/{bookingId} {
+        allow get: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+        allow list: if isValidId(userId)
+          && isOwner(userId)
+          && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidServiceBooking(incoming(), userId)
+          && incoming().status == 'pending'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId)
+          && isValidId(bookingId)
+          && isOwner(userId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidServiceBooking(incoming(), userId)
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            isAdmin() ||
+            (
+              existing().status != 'cancelled'
+              && incoming().status == 'cancelled'
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+            )
+          );
+        allow delete: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+      }
+    }
+
+    // Admin Role Markers
+    match /admins/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow create, update: if isValidId(userId)
+        && isAdmin()
+        && incoming().keys().hasAll(['uid', 'assignedAt'])
+        && incoming().keys().hasOnly(['uid', 'assignedAt'])
+        && incoming().uid == userId
+        && incoming().assignedAt == request.time;
+      allow delete: if isValidId(userId) && isAdmin();
+    }
+
+    // Admin-managed Catalog Entries
+    match /catalogEntries/{entryId} {
+      allow get: if isValidId(entryId) && isSignedIn();
+      allow list: if isSignedIn()
+        && resource.data.collectionType in ['destinations', 'foods', 'stays', 'packages'];
+      allow create: if isValidId(entryId)
+        && isAdmin()
+        && isValidCatalogEntry(incoming())
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(entryId)
+        && isAdmin()
+        && isValidCatalogEntry(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['collectionType', 'payload', 'updatedBy', 'updatedAt']);
+      allow delete: if isValidId(entryId) && isAdmin();
+    }
+  }
+}

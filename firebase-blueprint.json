@@ -1,0 +1,455 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user travel preferences, favorites, and checklist state synced across sessions.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name shown in account UI",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "favorites": {
+          "type": "array",
+          "description": "Saved destination IDs (max 100)"
+        },
+        "prepChecklist": {
+          "type": "object",
+          "description": "Map of checklist item keys to boolean completion flags"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "favorites", "prepChecklist", "createdAt", "updatedAt"]
+    },
+    "UserTrip": {
+      "title": "UserTrip",
+      "description": "Saved travel itinerary owned by a specific signed-in user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "days": {
+          "type": "integer"
+        },
+        "travellers": {
+          "type": "integer"
+        },
+        "activities": {
+          "type": "array"
+        },
+        "totalEstimate": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "name", "date", "days", "travellers", "activities", "totalEstimate", "createdAt", "updatedAt"]
+    },
+    "AdminMarker": {
+      "title": "AdminMarker",
+      "description": "Authoritative admin membership record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "assignedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "assignedAt"]
+    },
+    "CatalogEntry": {
+      "title": "CatalogEntry",
+      "description": "Admin-managed tourism catalog item (destination, food, stay, or package).",
+      "type": "object",
+      "properties": {
+        "collectionType": {
+          "type": "string",
+          "enum": ["destinations", "foods", "stays", "packages"]
+        },
+        "payload": {
+          "type": "object"
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["collectionType", "payload", "updatedBy", "updatedAt"]
+    },
+    "TravelBooking": {
+      "title": "TravelBooking",
+      "description": "User travel car reservation with route, vehicle, schedule, and status.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bookingCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "vehicleId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "vehicleName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "pickupLocation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "destinationRegion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "pickupDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "days": {
+          "type": "integer"
+        },
+        "passengers": {
+          "type": "integer"
+        },
+        "serviceType": {
+          "type": "string",
+          "enum": ["driver_fuel", "driver_only"]
+        },
+        "contactName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "contactPhone": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 24
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "totalEstimate": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "bookingCode",
+        "vehicleId",
+        "vehicleName",
+        "pickupLocation",
+        "destinationRegion",
+        "pickupDate",
+        "days",
+        "passengers",
+        "serviceType",
+        "contactName",
+        "contactPhone",
+        "notes",
+        "totalEstimate",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StayBooking": {
+      "title": "StayBooking",
+      "description": "User Muslim-friendly accommodation reservation with stay details, dates, rooms, guests, and status.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bookingCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "stayId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "stayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "stayRegion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "roomType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "checkInDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "nights": {
+          "type": "integer"
+        },
+        "rooms": {
+          "type": "integer"
+        },
+        "guests": {
+          "type": "integer"
+        },
+        "contactName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "contactPhone": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 24
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "totalEstimate": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "bookingCode",
+        "stayId",
+        "stayName",
+        "stayRegion",
+        "roomType",
+        "checkInDate",
+        "nights",
+        "rooms",
+        "guests",
+        "contactName",
+        "contactPhone",
+        "notes",
+        "totalEstimate",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ServiceBooking": {
+      "title": "ServiceBooking",
+      "description": "User per-page reservation for destination tickets, culinary orders, or waterboom tickets.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bookingCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "serviceType": {
+          "type": "string",
+          "enum": ["destination", "food", "waterboom"]
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "itemName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "itemRegion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "serviceDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "unitPrice": {
+          "type": "number"
+        },
+        "totalEstimate": {
+          "type": "number"
+        },
+        "contactName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "contactPhone": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 24
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "bookingCode",
+        "serviceType",
+        "itemId",
+        "itemName",
+        "itemRegion",
+        "serviceDate",
+        "quantity",
+        "unitPrice",
+        "totalEstimate",
+        "contactName",
+        "contactPhone",
+        "notes",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Owner-scoped user profile, favorites, and checklist state."
+    },
+    "/users/{userId}/trips/{tripId}": {
+      "schema": { "$ref": "#/entities/UserTrip" },
+      "description": "Owner-scoped saved travel itineraries."
+    },
+    "/users/{userId}/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/TravelBooking" },
+      "description": "Owner-scoped travel car reservations."
+    },
+    "/users/{userId}/stayBookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/StayBooking" },
+      "description": "Owner-scoped accommodation reservations."
+    },
+    "/users/{userId}/serviceBookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/ServiceBooking" },
+      "description": "Owner-scoped destination ticket, culinary order, and waterboom ticket reservations."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminMarker" },
+      "description": "Admin role documents."
+    },
+    "/catalogEntries/{entryId}": {
+      "schema": { "$ref": "#/entities/CatalogEntry" },
+      "description": "Admin-managed catalog additions and updates."
+    }
+  }
+}

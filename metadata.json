@@ -1,0 +1,6 @@
+{
+  "name": "Discover Aceh",
+  "description": "Panduan wisata ramah Muslim di Aceh dengan eksplorasi destinasi, peta interaktif, katalog kuliner & akomodasi, serta perencana perjalanan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

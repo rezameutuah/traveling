@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#075b46" />
+    <title>Discover Aceh — Panduan Wisata Ramah Muslim & Perencana Perjalanan</title>
+    <meta
+      name="description"
+      content="Jelajahi destinasi religi, sejarah, bahari, dan dataran tinggi Aceh dengan peta interaktif, direktori kuliner lokal, akomodasi ramah Muslim, dan perencana perjalanan."
+    />
+    <meta property="og:title" content="Discover Aceh — Panduan Wisata Ramah Muslim & Perencana Perjalanan" />
+    <meta
+      property="og:description"
+      content="Jelajahi destinasi religi, sejarah, bahari, dan dataran tinggi Aceh dengan peta interaktif, direktori kuliner lokal, akomodasi ramah Muslim, dan perencana perjalanan."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content" data-i18n="skipToContent">Lewati ke konten utama</a>
+
+    <header class="site-header" id="top">
+      <div class="container header-inner">
+        <a class="brand-wordmark" href="/" data-nav-page="home">Discover Aceh</a>
+
+        <nav class="nav-links" aria-label="Navigasi utama">
+          <a href="/destinasi" data-nav-page="destinations" data-i18n="navDest">Destinasi</a>
+          <a href="/galeri" data-nav-page="gallery" data-i18n="navGallery">Galeri</a>
+          <a href="/kuliner" data-nav-page="culinary" data-i18n="navFood">Kuliner</a>
+          <a href="/akomodasi" data-nav-page="stay" data-i18n="navStay">Akomodasi</a>
+          <a href="/waterboom" data-nav-page="waterboom" data-i18n="navWaterboom">Waterboom</a>
+          <a href="/mobil-travel" data-nav-page="travel-car" data-i18n="navCar">Mobil Travel</a>
+          <a href="/rencana-trip" data-nav-page="planner" data-i18n="navPlan">Rencana Trip</a>
+          <a href="/ringkasan" data-nav-page="summary" data-i18n="navSummary">Ringkasan</a>
+        </nav>
+
+        <div class="header-actions">
+          <button type="button" class="btn btn-primary" id="headerAuthBtn" data-i18n="navLoginBtn">Masuk</button>
+          <button
+            type="button"
+            class="mobile-menu-btn"
+            id="mobileMenuBtn"
+            aria-expanded="false"
+            aria-controls="mobileNavDrawer"
+            aria-label="Buka menu navigasi"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-drawer" id="mobileNavDrawer" hidden>
+        <div class="container mobile-drawer-inner">
+          <a href="/" data-nav-page="home" data-i18n="navHome">Beranda</a>
+          <a href="/destinasi" data-nav-page="destinations" data-i18n="navDest">Destinasi</a>
+          <a href="/peta" data-nav-page="region-map" data-i18n="navMap">Peta Wilayah</a>
+          <a href="/galeri" data-nav-page="gallery" data-i18n="navGallery">Galeri</a>
+          <a href="/kuliner" data-nav-page="culinary" data-i18n="navFood">Kuliner</a>
+          <a href="/akomodasi" data-nav-page="stay" data-i18n="navStay">Akomodasi</a>
+          <a href="/waterboom" data-nav-page="waterboom" data-i18n="navWaterboom">Waterboom</a>
+          <a href="/mobil-travel" data-nav-page="travel-car" data-i18n="navCar">Mobil Travel</a>
+          <a href="/rencana-trip" data-nav-page="planner" data-i18n="navPlan">Rencana Trip</a>
+          <a href="/checklist" data-nav-page="checklist" data-i18n="navChecklist">Checklist</a>
+          <a href="/ringkasan" data-nav-page="summary" data-i18n="navSummary">Ringkasan</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="login-page" id="loginView" aria-label="Halaman Login" hidden></section>
+
+    <main id="main-content">
+      <div class="page-breadcrumb-bar" id="pageBreadcrumbBar" hidden>
+        <div class="container page-breadcrumb-inner">
+          <button type="button" class="breadcrumb-home-btn" id="breadcrumbHomeBtn">
+            ← <span data-i18n="navHome">Beranda</span>
+          </button>
+          <span class="breadcrumb-sep" aria-hidden="true">/</span>
+          <span class="breadcrumb-current" id="breadcrumbCurrentPage"></span>
+        </div>
+      </div>
+
+      <div id="pagesOutlet"></div>
+    </main>
+
+    <section class="print-sheet" id="printSheet" aria-hidden="true"></section>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand-col">
+          <a class="footer-wordmark" href="/" data-nav-page="home">Discover Aceh</a>
+          <p class="footer-tagline" data-i18n="footerTagline">
+            Explore with meaning. Travel with respect. Panduan wisata ramah Muslim untuk Banda Aceh, Sabang, Aceh Besar, Aceh Tengah, dan Bener Meriah.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <a href="/" data-nav-page="home" data-i18n="navHome">Beranda</a>
+          <a href="/destinasi" data-nav-page="destinations" data-i18n="navDest">Destinasi</a>
+          <a href="/peta" data-nav-page="region-map" data-i18n="footerMap">Peta Wilayah</a>
+          <a href="/galeri" data-nav-page="gallery" data-i18n="navGallery">Galeri</a>
+          <a href="/kuliner" data-nav-page="culinary" data-i18n="navFood">Kuliner</a>
+          <a href="/akomodasi" data-nav-page="stay" data-i18n="navStay">Akomodasi</a>
+          <a href="/waterboom" data-nav-page="waterboom" data-i18n="navWaterboom">Waterboom</a>
+          <a href="/mobil-travel" data-nav-page="travel-car" data-i18n="navCar">Mobil Travel</a>
+          <a href="/rencana-trip" data-nav-page="planner" data-i18n="navPlan">Rencana Trip</a>
+          <a href="/checklist" data-nav-page="checklist" data-i18n="navChecklist">Checklist</a>
+          <a href="/ringkasan" data-nav-page="summary" data-i18n="navSummary">Ringkasan</a>
+        </div>
+
+        <div class="footer-tools-col">
+          <div class="lang-switch lang-switch-dark" role="group" aria-label="Pilihan bahasa di footer">
+            <button type="button" class="lang-btn is-active" data-lang="id">ID</button>
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+          </div>
+          <button type="button" class="footer-manage-btn" id="openAdminFooterBtn" data-i18n="manageCatalog">
+            Kelola Katalog
+          </button>
+          <p class="footer-copy" data-i18n="footerCopy">© 2026 Discover Aceh. Seluruh data tersimpan lokal di browser Anda.</p>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal-backdrop" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden>
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h2 id="detailTitle">Detail Destinasi</h2>
+          <button type="button" class="modal-close" id="closeDetailBtn" aria-label="Tutup detail">×</button>
+        </div>
+        <div class="modal-body" id="detailBody"></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="adminModal" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
+      <div class="modal-dialog modal-dialog-wide">
+        <div class="modal-header">
+          <h2 id="adminTitle" data-i18n="adminTitle">Kelola Katalog Wisata</h2>
+          <button type="button" class="modal-close" id="closeAdminBtn" aria-label="Tutup panel pengelola">×</button>
+        </div>
+        <div class="modal-body" id="adminModalBody"></div>
+      </div>
+    </div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <button type="button" class="back-to-top" id="backTopBtn" aria-label="Kembali ke atas" hidden>↑</button>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

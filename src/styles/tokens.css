@@ -1,0 +1,46 @@
+:root {
+  /* 60-30-10 Editorial Palette */
+  --canvas: #f7f8f4;
+  --surface: #ffffff;
+  --surface-muted: #eff3ee;
+  --surface-deep: #063d32;
+  --surface-footer: #052c24;
+
+  --ink: #142e27;
+  --ink-secondary: #3e554d;
+  --ink-muted: #5d7069;
+  --ink-on-dark: #f4f8f5;
+  --ink-muted-dark: #b9cdc3;
+
+  --accent: #075b46;
+  --accent-hover: #054434;
+  --accent-soft: #e6f0eb;
+  --gold: #d4a64a;
+  --gold-hover: #c39337;
+  --gold-ink: #1c1608;
+  --danger: #a6343d;
+  --danger-soft: #fae9eb;
+  --ok: #156642;
+
+  --line: rgba(20, 46, 39, 0.11);
+  --line-strong: rgba(20, 46, 39, 0.22);
+  --line-on-dark: rgba(255, 255, 255, 0.16);
+
+  /* Typography (2+1 Font Rule: Fraunces + Plus Jakarta Sans + JetBrains Mono) */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Spacing & Radii */
+  --container-max: 1220px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 4px 20px rgba(10, 42, 34, 0.06);
+  --shadow-hover: 0 12px 28px rgba(10, 42, 34, 0.11);
+  --shadow-modal: 0 24px 60px rgba(4, 24, 19, 0.28);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 160ms;
+}
